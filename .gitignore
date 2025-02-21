@@ -1,0 +1,54 @@
+# Environment normalization
+/.bundle
+/.config
+/vendor/bundle
+/lib/bundler/man
+
+# Gems
+*.gem
+/pkg
+
+# RSpec
+.rspec_status
+/spec/reports
+/spec/examples.txt
+/coverage
+
+# Documentation cache
+/.yardoc
+/_yardoc
+/doc
+/rdoc
+
+# Logs
+*.log
+*.log.[0-9]*
+
+# Temp
+/InstalledFiles
+/test/tmp
+/test/version_tmp
+/tmp
+
+# Databases
+*.sqlite
+*.db
+
+# Foreman/Dotenv
+Procfile.*
+.env*
+!.env-example
+
+# Pry/Byebug
+/.pry
+.pryrc
+.pry_history
+.byebug_history
+
+# RVM
+.rvmrc
+
+# RuboCop
+.rubocop-https?--*
+
+# Project specific

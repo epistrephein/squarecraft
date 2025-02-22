@@ -1,0 +1,56 @@
+estuary:
+  background: "#2b3240"
+  colors:
+    - "#dbcfb0"
+    - "#bfc8ad"
+    - "#90b494"
+    - "#718f94"
+    - "#545775"
+sunset:
+  background: "#213245"
+  colors:
+    - "#355070"
+    - "#6d597a"
+    - "#b56576"
+    - "#e56b6f"
+    - "#eaac8b"
+snazzy:
+  background: "#22162b"
+  colors:
+    - "#ffb2e6"
+    - "#d972ff"
+    - "#8447ff"
+    - "#8cffda"
+    - "#ffffe8"
+herbarium:
+  background: "#463734"
+  colors:
+    - "#8cb369"
+    - "#f4e285"
+    - "#f4a259"
+    - "#5b8e7d"
+    - "#bc4b51"
+hemoglobin:
+  background: "#310c16"
+  colors:
+    - "#721d34"
+    - "#8c2f39"
+    - "#b23a48"
+    - "#fcb9b2"
+    - "#fed0bb"
+chlorophyll:
+  background: "#212b31"
+  colors:
+    - "#cad2c5"
+    - "#84a98c"
+    - "#52796f"
+    - "#354f52"
+    - "#2f3e46"
+kitchen:
+  background: "#002e3d"
+  colors:
+    - "#0081a7"
+    - "#00afb9"
+    - "#fdfcdc"
+    - "#fed9b7"
+    - "#f07167"

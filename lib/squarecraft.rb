@@ -31,18 +31,10 @@ class Squarecraft
 
     bg  = Magick::SolidFill.new(background)
     img = Magick::Image.new(*picture_size, bg)
-
     rng = Random.new(seed.hex)
 
-    (rows * cols).times do |i|
-      gc = Magick::Draw.new
-      gc.fill(colors.sample(random: rng))
-      gc.rectangle(*coords(i))
-      gc.draw(img)
-    end
-
+    @picture = draw(img, rng)
     @epoch = Time.now.utc.to_i
-    @picture = img
 
     self
   end
@@ -69,6 +61,17 @@ class Squarecraft
     @gap        = args[:gap]        || DEFAULTS[:gap]
     @margin     = args[:margin]     || DEFAULTS[:margin]
     @multiplier = args[:multiplier] || DEFAULTS[:multiplier]
+  end
+
+  def draw(img, rng)
+    (rows * cols).times do |i|
+      gc = Magick::Draw.new
+      gc.fill(colors.sample(random: rng))
+      gc.rectangle(*coords(i))
+      gc.draw(img)
+    end
+
+    img
   end
 
   def picture_size

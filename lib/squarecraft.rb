@@ -27,6 +27,8 @@ class Squarecraft
   end
 
   def paint!
+    return self if painted?
+
     bg  = Magick::SolidFill.new(background)
     img = Magick::Image.new(*picture_size, bg)
 
@@ -43,6 +45,10 @@ class Squarecraft
     @picture = img
 
     self
+  end
+
+  def painted?
+    !@picture.nil?
   end
 
   private

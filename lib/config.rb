@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+require "yaml"
+
+module Squarecraft
+  class Config
+    class << self
+      def configuration
+        @configuration ||= load_configs!
+      end
+
+      private
+
+      def load_configs!
+        configuration = {}
+
+        Dir.glob(File.expand_path("../config/*.yml", __dir__)).each do |file|
+          key = File.basename(file, ".yml").downcase.to_sym
+          configuration[key] = YAML.load_file(file, symbolize_names: true)
+
+          define_singleton_method(key) { configuration[key] }
+        end
+
+        configuration
+      end
+    end
+  end
+end
+
+Squarecraft::Config.configuration

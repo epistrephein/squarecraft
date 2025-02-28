@@ -4,10 +4,10 @@ require "rmagick"
 
 module Squarecraft
   class Generator
-    attr_accessor :seed,
-                  :background, :colors,
-                  :rows, :cols, :size, :gap, :margin, :multiplier,
-                  :epoch, :picture
+    attr_reader :seed,
+                :background, :colors,
+                :rows, :cols, :size, :gap, :margin, :multiplier,
+                :epoch, :picture
 
     DEFAULTS = {
       seed:       "3A8EF7B1",

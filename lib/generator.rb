@@ -30,11 +30,9 @@ module Squarecraft
     def paint!
       return self if painted?
 
-      bg  = Magick::SolidFill.new(background)
-      img = Magick::Image.new(*picture_size, bg)
-      rng = Random.new(seed.hex)
+      @rng = Random.new(seed.hex)
 
-      @picture = draw(img, rng)
+      @picture = draw!
       @epoch = Time.now.utc.to_i
 
       self
@@ -64,15 +62,24 @@ module Squarecraft
       @multiplier = args[:multiplier] || DEFAULTS[:multiplier]
     end
 
-    def draw(img, rng)
+    def draw!
+      bg  = Magick::SolidFill.new(background)
+      img = Magick::Image.new(*picture_size, bg)
+
       (rows * cols).times do |i|
         gc = Magick::Draw.new
-        gc.fill(colors.sample(random: rng))
+        gc.fill(pick_color)
         gc.rectangle(*coords(i))
         gc.draw(img)
       end
 
       img
+    end
+
+    def pick_color
+      random_index = @rng.rand(0...colors.size)
+
+      colors[random_index]
     end
 
     def picture_size

@@ -7,7 +7,7 @@ module Squarecraft
     attr_reader :seed,
                 :background, :colors,
                 :rows, :cols, :size, :gap, :margin, :multiplier,
-                :epoch, :picture
+                :distribution, :sequence, :epoch, :picture
 
     DEFAULTS = {
       seed:       "3A8EF7B1",
@@ -31,6 +31,8 @@ module Squarecraft
       return self if painted?
 
       @rng = Random.new(seed.hex)
+      @distribution = Hash[(0...colors.size).map { |i| [i, 0] }]
+      @sequence = ""
 
       @picture = draw!
       @epoch = Time.now.utc.to_i
@@ -78,6 +80,9 @@ module Squarecraft
 
     def pick_color
       random_index = @rng.rand(0...colors.size)
+
+      @distribution[random_index] += 1
+      @sequence += random_index.to_s
 
       colors[random_index]
     end

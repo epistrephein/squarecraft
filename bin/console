@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "irb"
+
+require_relative "../lib/generator"
+require_relative "../lib/config"
+
+IRB.start(__FILE__)

@@ -23,8 +23,16 @@ module Squarecraft
 
         configuration
       end
+
+      def method_missing(name, *args, &block)
+        return send(name, *args, &block) if respond_to_missing?(name)
+
+        super
+      end
+
+      def respond_to_missing?(name, include_private = false)
+        configuration.key?(name) || super
+      end
     end
   end
 end
-
-Squarecraft::Config.configuration

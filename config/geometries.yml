@@ -1,0 +1,7 @@
+classic:
+  rows: 16
+  cols: 16
+  size: 2
+  gap: 0.15
+  margin: 8
+  multiplier: 80

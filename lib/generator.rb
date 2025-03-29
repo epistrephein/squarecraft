@@ -30,12 +30,25 @@ module Squarecraft
     def paint!
       return self if painted?
 
+      compute!
+
+      @picture = draw!
+      @epoch = Time.now.utc.to_i
+
+      self
+    end
+
+    def compute!
       @rng = Random.new(seed.hex)
       @distribution = Hash[(0...colors.size).map { |i| [i, 0] }]
       @sequence = ""
 
-      @picture = draw!
-      @epoch = Time.now.utc.to_i
+      (rows * cols).times do
+        random_color_index = @rng.rand(0...colors.size)
+
+        @distribution[random_color_index] += 1
+        @sequence += random_color_index.to_s
+      end
 
       self
     end
@@ -68,23 +81,14 @@ module Squarecraft
       bg  = Magick::SolidFill.new(background)
       img = Magick::Image.new(*picture_size, bg)
 
-      (rows * cols).times do |i|
+      sequence.chars.each_with_index do |c, i|
         gc = Magick::Draw.new
-        gc.fill(pick_color)
+        gc.fill(colors[c.to_i])
         gc.rectangle(*coords(i))
         gc.draw(img)
       end
 
       img
-    end
-
-    def pick_color
-      random_index = @rng.rand(0...colors.size)
-
-      @distribution[random_index] += 1
-      @sequence += random_index.to_s
-
-      colors[random_index]
     end
 
     def picture_size

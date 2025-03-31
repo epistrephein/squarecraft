@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Generates multiple example images using a specified color palette.
+
+require "bundler/setup"
+require "securerandom"
+
+require_relative "../lib/generator"
+require_relative "../lib/config"
+
+EXAMPLES_DIR = File.expand_path("../examples", __dir__)
+DISTRIBUTION_RANGE = (40..65)
+DEFAULT_GEOMETRY = :classic
+EXAMPLES_NUM = 25
+INDEX_PADDING = 3
+
+if ARGV.size != 1
+  puts "Usage: #{$PROGRAM_NAME} <palette>"
+  exit 0
+end
+
+palette = ARGV[0].strip.downcase.to_sym
+Dir.mkdir(EXAMPLES_DIR) unless Dir.exist?(EXAMPLES_DIR)
+
+# Check if palette exists.
+unless Squarecraft::Config.palettes.key?(palette)
+  puts "Palette '#{palette}' not found: define it in 'palettes.yml' first"
+  exit 1
+end
+
+# Check if example image already exists.
+examples = Dir.glob(File.join(EXAMPLES_DIR, "*.png")).sort
+palette_example = examples.find { |f| File.basename(f).include?(palette.to_s) }
+if palette_example
+  puts "Example for palette '#{palette}' already exists: #{File.basename(palette_example)}"
+  exit 1
+end
+
+# Retrieve palette and geometry values.
+palette_args = Squarecraft::Config.palettes[palette.to_sym]
+geometry_args = Squarecraft::Config.geometries[DEFAULT_GEOMETRY]
+
+example_index = examples.size + 1
+
+# Run multiple threads to generate images concurrently.
+threads = EXAMPLES_NUM.times.map do
+  Thread.new do
+    # Compute image until distribution range is valid.
+    generator = loop do
+      gen = Squarecraft::Generator.new(
+        seed: SecureRandom.hex(4),
+        **geometry_args,
+        **palette_args
+      )
+      gen.compute!
+
+      break gen if gen.distribution.values.all? { |v| DISTRIBUTION_RANGE.cover?(v) }
+    end
+
+    # Paint image.
+    generator.paint!
+
+    # Format filename and save image.
+    filename = format(
+      "%<index>0#{INDEX_PADDING}d-%<seed>s-%<palette>s.png",
+      index:   example_index,
+      seed:    generator.seed.downcase,
+      palette: palette.to_s
+    )
+
+    filepath = File.join(EXAMPLES_DIR, filename)
+    generator.picture.write(filepath)
+
+    puts "Generated example: #{filename}"
+  end
+end
+
+# Wait for all threads to finish.
+threads.each(&:join)

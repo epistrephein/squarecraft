@@ -54,3 +54,11 @@ kitchen:
     - "#fdfcdc"
     - "#fed9b7"
     - "#f07167"
+caprese:
+  :background: "#132418"
+  :colors:
+    - "#386641"
+    - "#6a994e"
+    - "#a7c957"
+    - "#f2e8cf"
+    - "#bc4749"

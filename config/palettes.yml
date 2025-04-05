@@ -70,3 +70,11 @@ yolk:
     - "#f7fff7"
     - "#ff6b6b"
     - "#ffe66d"
+highlighter:
+  background: "#313435"
+  colors:
+    - "#848c8e"
+    - "#435058"
+    - "#dcf763"
+    - "#bfb7b6"
+    - "#f1f2ee"

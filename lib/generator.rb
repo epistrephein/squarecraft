@@ -7,7 +7,8 @@ module Squarecraft
     attr_reader :seed,
                 :background, :colors,
                 :rows, :cols, :size, :gap, :margin, :multiplier,
-                :distribution, :sequence, :epoch, :picture
+                :distribution, :sequence,
+                :epoch, :filename, :picture
 
     DEFAULTS = {
       seed:       "3A8EF7B1",
@@ -34,6 +35,7 @@ module Squarecraft
 
       @picture = draw!
       @epoch = Time.now.utc.to_i
+      @filename = "#{epoch}-#{seed}--#{background}--#{colors.join('-')}.png"
 
       self
     end

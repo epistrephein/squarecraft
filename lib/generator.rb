@@ -10,8 +10,11 @@ module Squarecraft
                 :distribution, :sequence,
                 :epoch, :filename, :picture
 
+    SEED_REGEX = /\A[0-9a-f]+\z/
+    COLOR_REGEX = /\A#[0-9a-f]{6}\z/
+
     DEFAULTS = {
-      seed:       "3A8EF7B1",
+      seed:       "3a8ef7b1",
       background: "#2b3240",
       colors:     ["#dbcfb0", "#bfc8ad", "#90b494", "#718f94", "#545775"],
       rows:       16,
@@ -62,12 +65,17 @@ module Squarecraft
     private
 
     def setup_seed!(args)
-      @seed = args[:seed] || DEFAULTS[:seed]
+      @seed = (args[:seed] || DEFAULTS[:seed]).downcase
+
+      raise ArgumentError, "Seed must be a hex string" unless @seed.match?(SEED_REGEX)
     end
 
     def setup_colors!(args)
-      @background = args[:background] || DEFAULTS[:background]
-      @colors     = args[:colors]     || DEFAULTS[:colors]
+      @background = (args[:background] || DEFAULTS[:background]).downcase
+      @colors     = (args[:colors]     || DEFAULTS[:colors]).map(&:downcase)
+
+      raise ArgumentError, "Background must be in hex format" unless background.match?(COLOR_REGEX)
+      raise ArgumentError, "Colors must be in hex format" unless colors.all? { |c| c.match?(COLOR_REGEX) }
     end
 
     def setup_geometry!(args)

@@ -102,8 +102,8 @@ module Squarecraft
     end
 
     def picture_size
-      width  = (margin + (rows * size) + ((rows - 1) * gap) + margin) * multiplier
-      height = (margin + (cols * size) + ((cols - 1) * gap) + margin) * multiplier
+      width  = (margin + (cols * size) + ((cols - 1) * gap) + margin) * multiplier
+      height = (margin + (rows * size) + ((rows - 1) * gap) + margin) * multiplier
 
       [width, height]
     end

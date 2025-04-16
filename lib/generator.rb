@@ -109,11 +109,11 @@ module Squarecraft
     end
 
     def coords(index)
-      mod_row = (index % rows)
-      mod_col = (index / cols)
+      mod_row = (index / cols)
+      mod_col = (index % cols)
 
-      x = margin + size * mod_row + gap * mod_row
-      y = margin + size * mod_col + gap * mod_col
+      x = margin + size * mod_col + gap * mod_col
+      y = margin + size * mod_row + gap * mod_row
 
       [x, y, (x + size - gap), (y + size - gap)].map { |i| i * multiplier }
     end

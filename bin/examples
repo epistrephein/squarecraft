@@ -4,7 +4,6 @@
 # Generates multiple example images using a specified color palette.
 
 require "bundler/setup"
-require "securerandom"
 
 require_relative "../lib/generator"
 require_relative "../lib/config"

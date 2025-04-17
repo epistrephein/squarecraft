@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rmagick"
+require "securerandom"
 
 module Squarecraft
   class Generator

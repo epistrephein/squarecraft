@@ -1,0 +1,124 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "optparse"
+
+require_relative "../lib/generator"
+require_relative "../lib/config"
+
+module Squarecraft
+  class CLI
+    VERSION = "1.0.0"
+    GENERATED_DIR = File.expand_path("../generated", __dir__)
+
+    def parse(argv)
+      options = {}
+
+      parser = OptionParser.new do |opts|
+        opts.banner = "Usage: bin/#{File.basename($PROGRAM_NAME)} [options]"
+
+        # --palette
+        opts.on("-p", "--palette NAME", "Palette name (e.g. estuary)") do |v|
+          palette = Config.palettes[v.to_sym]
+          raise OptionParser::InvalidArgument, "unknown palette: #{v}" if palette.nil?
+
+          options.update(palette)
+        end
+
+        # --geometry
+        opts.on("-e", "--geometry NAME", "Geometry name (e.g. classic)") do |v|
+          geometry = Config.geometries[v.to_sym]
+          raise OptionParser::InvalidArgument, "unknown geometry: #{v}" if geometry.nil?
+
+          options.update(geometry)
+        end
+
+        # --seed
+        opts.on("-s", "--seed HEX", "RNG seed (e.g. a1b2c3d4)") do |v|
+          options[:seed] = v
+        end
+
+        # --background
+        opts.on("-b", "--background #HEX", "Background color (e.g. #000000)") do |v|
+          options[:background] = v
+        end
+
+        # --colors a,b,c
+        opts.on("-c", "--colors #HEX1,#HEX2...", Array,
+                "Comma-separated colors (e.g. #ff0000,#00ff00,#0000ff)") do |list|
+          options[:colors] = list
+        end
+
+        # --rows
+        opts.on("-r", "--rows INT", Integer, "Number of rows (integer)") do |n|
+          raise OptionParser::InvalidArgument, "rows must be > 0" if n <= 0
+
+          options[:rows] = n
+        end
+
+        # --cols
+        opts.on("-l", "--cols INT", Integer, "Number of columns (integer)") do |n|
+          raise OptionParser::InvalidArgument, "cols must be > 0" if n <= 0
+
+          options[:cols] = n
+        end
+
+        # --size
+        opts.on("-z", "--size INT", Integer, "Tiles size (integer)") do |n|
+          raise OptionParser::InvalidArgument, "size must be > 0" if n <= 0
+
+          options[:size] = n
+        end
+
+        # --gap
+        opts.on("-g", "--gap FLOAT", Float, "Gap between tiles (float)") do |n|
+          options[:gap] = n
+        end
+
+        # --margin
+        opts.on("-m", "--margin INT", Integer, "Outer margin (integer)") do |n|
+          options[:margin] = n
+        end
+
+        # --multiplier
+        opts.on("-x", "--multiplier INT", Integer, "Scale multiplier (integer)") do |n|
+          raise OptionParser::InvalidArgument, "multiplier must be > 0" if n <= 0
+
+          options[:multiplier] = n
+        end
+
+        # --version
+        opts.on("-v", "--version", "Show version") do
+          puts VERSION
+          exit
+        end
+
+        # --help
+        opts.on("-h", "--help", "Show this help") do
+          puts opts
+          exit
+        end
+      end
+
+      parser.parse!(argv)
+      options
+    rescue OptionParser::ParseError => e
+      warn("#{e.message}\n\n#{parser}")
+      exit 1
+    end
+
+    def run(argv = ARGV)
+      opts = parse(argv)
+
+      generator = Generator.new(**opts).paint!
+
+      Dir.mkdir(GENERATED_DIR) unless Dir.exist?(GENERATED_DIR)
+      generator.picture.write(File.join(GENERATED_DIR, generator.filename))
+
+      puts "Generated: #{generator.filename}"
+    end
+  end
+end
+
+Squarecraft::CLI.new.run if $PROGRAM_NAME == __FILE__

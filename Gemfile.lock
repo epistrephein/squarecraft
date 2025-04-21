@@ -27,7 +27,6 @@ GEM
       stringio
     racc (1.8.1)
     rainbow (3.1.1)
-    rake (13.3.0)
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
@@ -63,7 +62,6 @@ PLATFORMS
 
 DEPENDENCIES
   irb (~> 1.15)
-  rake (>= 13.0)
   rmagick (~> 6.1)
   rubocop (~> 1.50)
 

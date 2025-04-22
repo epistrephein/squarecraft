@@ -78,3 +78,11 @@ highlighter:
     - "#dcf763"
     - "#bfb7b6"
     - "#f1f2ee"
+pool:
+  background: "#10142d"
+  colors:
+    - "#21295c"
+    - "#1b3b6f"
+    - "#065a82"
+    - "#1c7293"
+    - "#9eb3c2"

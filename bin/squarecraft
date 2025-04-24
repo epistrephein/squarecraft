@@ -18,6 +18,8 @@ module Squarecraft
       parser = OptionParser.new do |opts|
         opts.banner = "Usage: bin/#{File.basename($PROGRAM_NAME)} [options]"
 
+        opts.separator ""
+
         # --palette
         opts.on("-p", "--palette NAME", "Palette name (e.g. estuary)") do |v|
           palette = Config.palettes[v.to_sym]
@@ -34,10 +36,14 @@ module Squarecraft
           options.update(geometry)
         end
 
+        opts.separator ""
+
         # --seed
         opts.on("-s", "--seed HEX", "RNG seed (e.g. a1b2c3d4)") do |v|
           options[:seed] = v
         end
+
+        opts.separator ""
 
         # --background
         opts.on("-b", "--background #HEX", "Background color (e.g. #000000)") do |v|
@@ -49,6 +55,8 @@ module Squarecraft
                 "Comma-separated colors (e.g. #ff0000,#00ff00,#0000ff)") do |list|
           options[:colors] = list
         end
+
+        opts.separator ""
 
         # --rows
         opts.on("-r", "--rows INT", Integer, "Number of rows (integer)") do |n|
@@ -87,6 +95,8 @@ module Squarecraft
 
           options[:multiplier] = n
         end
+
+        opts.separator ""
 
         # --version
         opts.on("-v", "--version", "Show version") do

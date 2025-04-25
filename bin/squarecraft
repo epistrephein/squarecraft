@@ -43,6 +43,11 @@ module Squarecraft
           options[:seed] = v
         end
 
+        # --random-seed
+        opts.on("-q", "--random-seed", "Generate a random seed") do
+          options[:seed] = SecureRandom.hex(4)
+        end
+
         opts.separator ""
 
         # --background
@@ -50,7 +55,7 @@ module Squarecraft
           options[:background] = v
         end
 
-        # --colors a,b,c
+        # --colors
         opts.on("-c", "--colors #HEX1,#HEX2...", Array,
                 "Comma-separated colors (e.g. #ff0000,#00ff00,#0000ff)") do |list|
           options[:colors] = list

@@ -86,3 +86,11 @@ pool:
     - "#065a82"
     - "#1c7293"
     - "#9eb3c2"
+smaland:
+  background: "#19344d"
+  colors:
+    - "#26547c"
+    - "#ef476f"
+    - "#ffd166"
+    - "#06d6a0"
+    - "#fffcf9"

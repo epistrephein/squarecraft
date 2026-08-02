@@ -5,6 +5,9 @@ require "bundler/setup"
 require "simplecov"
 SimpleCov.start
 
+require_relative "../lib/config"
+require_relative "../lib/generator"
+
 RSpec.configure do |config|
   # Turn on all Ruby warnings
   config.warnings = :all

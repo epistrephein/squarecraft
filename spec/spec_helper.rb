@@ -2,6 +2,9 @@
 
 require "bundler/setup"
 
+require "simplecov"
+SimpleCov.start
+
 RSpec.configure do |config|
   # Turn on all Ruby warnings
   config.warnings = :all

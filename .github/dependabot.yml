@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "bundler"
+    directory: "/"
+    versioning-strategy: increase-if-necessary
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 21
+    open-pull-requests-limit: 3
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
+    assignees:
+      - "epistrephein"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    assignees:
+      - "epistrephein"

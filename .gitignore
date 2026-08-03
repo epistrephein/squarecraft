@@ -34,12 +34,16 @@
 *.sqlite
 *.db
 
+# Redis
+*.rdb
+
 # Foreman/Dotenv
 Procfile.*
 .env*
 !.env-example
 
-# Pry/Byebug
+# IRB/Pry/Byebug
+.irbrc
 /.pry
 .pryrc
 .pry_history

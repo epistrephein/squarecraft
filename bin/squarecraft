@@ -20,20 +20,20 @@ module Squarecraft
 
         opts.separator ""
 
-        # --palette
-        opts.on("-p", "--palette NAME", "Palette name (e.g. estuary)") do |v|
-          palette = Config.palettes[v.to_sym]
-          raise OptionParser::InvalidArgument, "unknown palette: #{v}" if palette.nil?
-
-          options.update(palette)
-        end
-
         # --geometry
         opts.on("-e", "--geometry NAME", "Geometry name (e.g. classic)") do |v|
           geometry = Config.geometries[v.to_sym]
           raise OptionParser::InvalidArgument, "unknown geometry: #{v}" if geometry.nil?
 
           options.update(geometry)
+        end
+
+        # --palette
+        opts.on("-p", "--palette NAME", "Palette name (e.g. estuary)") do |v|
+          palette = Config.palettes[v.to_sym]
+          raise OptionParser::InvalidArgument, "unknown palette: #{v}" if palette.nil?
+
+          options.update(palette)
         end
 
         opts.separator ""

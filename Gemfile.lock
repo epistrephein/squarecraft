@@ -3,7 +3,7 @@ GEM
   specs:
     ast (2.4.3)
     diff-lcs (1.6.2)
-    erb (6.0.6)
+    erb (6.0.7)
     io-console (0.8.2)
     irb (1.18.0)
       pp (>= 0.6.0)
@@ -26,6 +26,7 @@ GEM
     prism (1.9.0)
     racc (1.8.1)
     rainbow (3.1.1)
+    rake (13.4.2)
     rbs (4.1.2)
       logger
       prism (>= 1.6.0)
@@ -54,7 +55,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    rubocop (1.88.2)
+    rubocop (1.89.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.1.0)
@@ -81,6 +82,7 @@ PLATFORMS
 
 DEPENDENCIES
   irb (~> 1.15)
+  rake (~> 13.3)
   rmagick (~> 7.1)
   rspec (~> 3.13)
   rubocop (~> 1.50)

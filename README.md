@@ -13,8 +13,8 @@ It works like this:
    color using that PRNG.
 3. Each cell is drawn as a square with a configurable size, gap, margin, and scale.
 4. The image is written to a PNG whose filename records the seed, background,
-  and palette, so any picture can be traced back to the exact inputs that
-  produced it.
+   and palette, so any picture can be traced back to the exact inputs that
+   produced it.
 
 Because the RNG is seeded, generation is fully deterministic: using the same seed,
 palette and geometry will produce a byte-for-byte identical layout every time.
@@ -140,8 +140,8 @@ gen.picture.write("out.png")
 Tests and linting can be run with:
 
 ```bash
-bundle exec rspec
-bundle exec rubocop
+rake spec
+rake rubocop
 ```
 
 ## License

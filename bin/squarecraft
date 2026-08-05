@@ -129,7 +129,7 @@ module Squarecraft
       generator = Generator.new(**opts).paint!
 
       Dir.mkdir(GENERATED_DIR) unless Dir.exist?(GENERATED_DIR)
-      generator.picture.write(File.join(GENERATED_DIR, generator.filename))
+      File.binwrite(File.join(GENERATED_DIR, generator.filename), generator.picture)
 
       puts "Generated: #{generator.filename}"
     end

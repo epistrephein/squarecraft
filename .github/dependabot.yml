@@ -9,14 +9,19 @@ updates:
       default-days: 21
     open-pull-requests-limit: 3
     groups:
-      all-dependencies:
+      bundler:
         patterns:
           - "*"
     assignees:
       - "epistrephein"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     assignees:
       - "epistrephein"

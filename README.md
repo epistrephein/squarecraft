@@ -12,36 +12,21 @@ It works like this:
 2. Squarecraft walks a `rows × cols` grid and, for each cell, picks a palette
    color using that PRNG.
 3. Each cell is drawn as a square with a configurable size, gap, margin, and scale.
-4. The image is written to a PNG whose filename records the seed, background,
-   and palette, so any picture can be traced back to the exact inputs that
-   produced it.
+4. The grid is rendered directly into indexed PNG scanlines and encoded by a
+   small pure-Ruby PNG writer, then written to disk with a filename that
+   records the seed, background, and palette, so any picture can be traced
+   back to the exact inputs that produced it.
 
 Because the RNG is seeded, generation is fully deterministic: using the same seed,
 palette and geometry will produce a byte-for-byte identical layout every time.
 
-## Requirements
+## Usage
 
-- **Ruby 4**
-- **ImageMagick** (the [RMagick](https://github.com/rmagick/rmagick) gem does
-  the actual drawing)
-
-Install ImageMagick first:
-
-```bash
-# macOS
-brew install imagemagick
-
-# Debian/Ubuntu
-sudo apt-get install libmagickwand-dev imagemagick
-```
-
-Then just install the gem dependencies:
+Install the gem dependencies:
 
 ```bash
 bundle install
 ```
-
-## Usage
 
 Run the CLI with no arguments to generate an image using the built-in defaults:
 
@@ -88,13 +73,15 @@ bin/squarecraft --palette caprese --rows 24 --cols 24 --gap 0.25
 | `-v`  | `--version`       |                     | Print the version                                  |
 | `-h`  | `--help`          |                     | Show help                                          |
 
-Colors and backgrounds must be six-digit hex (`#rrggbb`); seeds must be a valid hex string.  
-Palette and geometry options are simply presets that fill in these same values: anything
-passed explicitly on the command line overrides the preset.
+Colors and backgrounds must be six-digit hex (`#rrggbb`); seeds must be a valid
+hex string.  
+Palette and geometry options are simply presets that fill in these same values:
+anything passed explicitly on the command line overrides the preset.
 
 ## Palettes and geometries
 
-Presets live in plain YAML files so custom values can be added without touching any code.
+Presets live in plain YAML files so custom values can be added without touching
+any code.
 
 **`config/palettes.yml`** – each palette names a `background` and a list of `colors`:
 
@@ -134,7 +121,7 @@ It can be used for experimenting with the generator directly in Ruby:
 ```ruby
 gen = Squarecraft::Generator.new(seed: "a1b2c3d4", **Squarecraft::Config.palettes[:sunset])
 gen.paint!
-gen.picture.write("out.png")
+File.binwrite("out.png", gen.picture)
 ```
 
 Tests and linting can be run with:

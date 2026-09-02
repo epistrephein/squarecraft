@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require "rmagick"
 require "securerandom"
+
+require_relative "png"
 
 module Squarecraft
   class Generator
@@ -89,17 +90,42 @@ module Squarecraft
     end
 
     def draw!
-      bg  = Magick::SolidFill.new(background)
-      img = Magick::Image.new(*picture_size, bg)
+      width, height = picture_size.map(&:round)
 
-      sequence.chars.each_with_index do |c, i|
-        gc = Magick::Draw.new
-        gc.fill(colors[c.to_i])
-        gc.rectangle(*coords(i))
-        gc.draw(img)
+      Png.indexed(width:     width,
+                  height:    height,
+                  palette:   [background] + colors,
+                  scanlines: scanlines(width, height))
+    end
+
+    # One palette-index String per pixel row. Only `rows + 1` distinct row
+    # patterns exist (the background plus one per grid row), so the same
+    # Strings are shared across the whole image.
+    def scanlines(width, height)
+      background_row = ("\x00" * width).b
+      side = ((size - gap) * multiplier).round + 1 # rectangle edges are inclusive
+      return Array.new(height, background_row) if side < 1
+
+      grid_row_lines = Array.new(rows) { background_row.dup }
+      grid_row_for_y = Array.new(height)
+
+      sequence.each_char.with_index do |color, index|
+        x, y, = coords(index)
+        grid_row = index / cols
+
+        splice_square!(grid_row_lines[grid_row], x.round, side, color.to_i + 1, width)
+        ([y.round, 0].max...[y.round + side, height].min).each { |py| grid_row_for_y[py] = grid_row }
       end
 
-      img
+      grid_row_for_y.map { |grid_row| grid_row ? grid_row_lines[grid_row] : background_row }
+    end
+
+    def splice_square!(line, start_x, side, palette_index, width)
+      left = start_x.clamp(0, width)
+      right = (start_x + side).clamp(0, width)
+      return if right <= left
+
+      line[left, right - left] = palette_index.chr * (right - left)
     end
 
     def picture_size

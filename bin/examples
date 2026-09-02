@@ -69,7 +69,7 @@ threads = EXAMPLES_NUM.times.map do
     )
 
     filepath = File.join(EXAMPLES_DIR, filename)
-    generator.picture.write(filepath)
+    File.binwrite(filepath, generator.picture)
 
     puts "Generated example: #{filename}"
   end

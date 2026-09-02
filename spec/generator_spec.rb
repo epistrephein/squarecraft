@@ -116,9 +116,18 @@ RSpec.describe Squarecraft::Generator do
   describe "#paint!" do
     subject(:generator) { described_class.new(rows: 2, cols: 2) }
 
-    it "sets picture" do
+    it "sets picture to a PNG blob" do
       generator.paint!
-      expect(generator.picture).to be_a(Magick::Image)
+      expect(generator.picture).to be_a(String)
+      expect(generator.picture.bytesize).to be > 8
+      expect(generator.picture.byteslice(0, 8)).to eq("\x89PNG\r\n\x1a\n".b)
+    end
+
+    it "encodes the expected dimensions in the PNG header" do
+      generator.paint!
+      width, height = generator.picture.byteslice(16, 8).unpack("NN")
+      expect(width).to eq(1612)
+      expect(height).to eq(1612)
     end
 
     it "sets epoch" do

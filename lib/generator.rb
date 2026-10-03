@@ -92,40 +92,22 @@ module Squarecraft
     def draw!
       width, height = picture_size.map(&:round)
 
-      Png.indexed(width:     width,
-                  height:    height,
-                  palette:   [background] + colors,
-                  scanlines: scanlines(width, height))
+      Png.render(width:   width,
+                 height:  height,
+                 palette: [background] + colors,
+                 rects:   rects)
     end
 
-    # One palette-index String per pixel row. Only `rows + 1` distinct row
-    # patterns exist (the background plus one per grid row), so the same
-    # Strings are shared across the whole image.
-    def scanlines(width, height)
-      background_row = ("\x00" * width).b
+    # One [x, y, width, height, palette_index] square per tile, where index 0
+    # is the background.
+    def rects
       side = ((size - gap) * multiplier).round + 1 # rectangle edges are inclusive
-      return Array.new(height, background_row) if side < 1
 
-      grid_row_lines = Array.new(rows) { background_row.dup }
-      grid_row_for_y = Array.new(height)
-
-      sequence.each_char.with_index do |color, index|
+      sequence.each_char.with_index.map do |color, index|
         x, y, = coords(index)
-        grid_row = index / cols
 
-        splice_square!(grid_row_lines[grid_row], x.round, side, color.to_i + 1, width)
-        ([y.round, 0].max...[y.round + side, height].min).each { |py| grid_row_for_y[py] = grid_row }
+        [x.round, y.round, side, side, color.to_i + 1]
       end
-
-      grid_row_for_y.map { |grid_row| grid_row ? grid_row_lines[grid_row] : background_row }
-    end
-
-    def splice_square!(line, start_x, side, palette_index, width)
-      left = start_x.clamp(0, width)
-      right = (start_x + side).clamp(0, width)
-      return if right <= left
-
-      line[left, right - left] = palette_index.chr * (right - left)
     end
 
     def picture_size

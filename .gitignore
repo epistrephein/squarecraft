@@ -57,3 +57,8 @@ Procfile.*
 
 # Project specific
 /generated
+
+# Rust
+/target
+/lib/squarecraft/*.so
+/lib/squarecraft/*.bundle

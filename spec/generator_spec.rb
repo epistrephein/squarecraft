@@ -130,6 +130,21 @@ RSpec.describe Squarecraft::Generator do
       expect(height).to eq(1612)
     end
 
+    it "draws every tile with its color over the background" do
+      generator = described_class.new(rows: 3, cols: 4, size: 2, gap: 0.5, margin: 1, multiplier: 10)
+      colors = PngReader.read(generator.paint!.picture).colors
+
+      expect(colors.first.uniq).to eq([generator.background])
+      generator.sequence.each_char.with_index do |color, index|
+        x = 10 + ((index % 4) * 25)
+        y = 10 + ((index / 4) * 25)
+
+        expect(colors[y][x]).to eq(generator.colors[color.to_i])
+        expect(colors[y + 15][x + 15]).to eq(generator.colors[color.to_i])
+        expect(colors[y + 16][x + 16]).to eq(generator.background)
+      end
+    end
+
     it "sets epoch" do
       generator.paint!
       expect(generator.epoch).to be_a(Integer)

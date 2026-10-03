@@ -25,3 +25,18 @@ updates:
           - "*"
     assignees:
       - "epistrephein"
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    versioning-strategy: increase-if-necessary
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 21
+    open-pull-requests-limit: 3
+    groups:
+      cargo:
+        patterns:
+          - "*"
+    assignees:
+      - "epistrephein"

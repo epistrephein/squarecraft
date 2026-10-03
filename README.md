@@ -12,20 +12,23 @@ It works like this:
 2. Squarecraft walks a `rows × cols` grid and, for each cell, picks a palette
    color using that PRNG.
 3. Each cell is drawn as a square with a configurable size, gap, margin, and scale.
-4. The grid is rendered directly into indexed PNG scanlines and encoded by a
-   small pure-Ruby PNG writer, then written to disk with a filename that
-   records the seed, background, and palette, so any picture can be traced
-   back to the exact inputs that produced it.
+4. The tiles are handed to a native renderer written in Rust, which paints them
+   into an indexed-color PNG, then the picture is written to disk with a
+   filename that records the seed, background, and palette, so any picture
+   can be traced back to the exact inputs that produced it.
 
 Because the RNG is seeded, generation is fully deterministic: using the same seed,
 palette and geometry will produce a byte-for-byte identical layout every time.
 
 ## Usage
 
-Install the gem dependencies:
+Building requires a [Rust toolchain](https://rustup.rs) (stable) and `libclang`
+in addition to Ruby. Install the gem dependencies and compile the native
+extension:
 
 ```bash
 bundle install
+bundle exec rake compile
 ```
 
 Run the CLI with no arguments to generate an image using the built-in defaults:
@@ -124,10 +127,39 @@ gen.paint!
 File.binwrite("out.png", gen.picture)
 ```
 
+### Native renderer
+
+Everything users interact with (CLI, options, presets, seeding and tile
+layout) is Ruby. Rasterization and PNG encoding live in a Rust extension under
+`ext/squarecraft`, exposed to Ruby as `Squarecraft::Png.render`. Since the
+pictures are made of a few rows of identical tiles, the renderer never touches
+pixels one by one:
+
+- the canvas is swept top to bottom and split into bands of identical rows,
+  each stored once as runs of palette indices, packed to the smallest bit
+  depth that fits the palette;
+- the scanlines are compressed by a deflate encoder built for that shape: each
+  run becomes a literal plus back-references, repeated rows become either
+  Up-filtered zero rows or back-references one row away (whichever is
+  smaller), and the Huffman codes are built from the exact symbol frequencies;
+- the Adler-32 checksum is computed in closed form per run and per repeated
+  row.
+
+The cost therefore grows with the number of bands, runs, and emitted symbols
+rather than with the number of pixels: the default 4020×4020 picture renders in
+about a millisecond.
+
+After changing the Rust code, rebuild the extension with:
+
+```bash
+bundle exec rake compile
+```
+
 Tests and linting can be run with:
 
 ```bash
-rake spec
+rake spec        # compiles the extension, then runs RSpec
+rake cargo_test  # Rust unit tests
 rake rubocop
 ```
 

@@ -7,6 +7,7 @@ SimpleCov.start
 
 require_relative "../lib/config"
 require_relative "../lib/generator"
+require_relative "support/png_reader"
 
 RSpec.configure do |config|
   # Turn on all Ruby warnings

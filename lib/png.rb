@@ -1,65 +1,22 @@
 # frozen_string_literal: true
 
-require "zlib"
+begin
+  require_relative "squarecraft/squarecraft"
+rescue LoadError
+  raise LoadError, "Squarecraft native extension is missing: build it with `bundle exec rake compile`"
+end
 
 module Squarecraft
-  # Minimal indexed-color (palette) PNG writer.
-  # Takes one scanline String per pixel row, where each byte is a palette
-  # index, and returns a complete PNG file as a binary blob. Repeated
-  # scanline objects are packed only once, so callers can share row Strings.
-  class Png
-    SIGNATURE = "\x89PNG\r\n\x1a\n".b
-    FILTER_NONE = "\x00".b
-    MAX_COLORS = 256
+  # Indexed-color PNG renderer backed by the native extension.
+  # Paints filled rectangles over the first palette color and returns the
+  # complete PNG file as a binary blob.
+  module Png
+    MAX_COLORS = Native::MAX_COLORS
 
-    def self.indexed(width:, height:, palette:, scanlines:)
-      new(width, height, palette, scanlines).blob
-    end
-
-    def initialize(width, height, palette, scanlines)
-      raise ArgumentError, "Palette can hold at most #{MAX_COLORS} colors" if palette.size > MAX_COLORS
-
-      @width = width
-      @height = height
-      @palette = palette
-      @scanlines = scanlines
-    end
-
-    def blob
-      SIGNATURE +
-        chunk("IHDR", [@width, @height, bit_depth, 3, 0, 0, 0].pack("NNC5")) +
-        chunk("PLTE", @palette.map { |hex| [hex.delete_prefix("#")].pack("H*") }.join) +
-        chunk("IDAT", Zlib::Deflate.deflate(raw_stream, Zlib::BEST_COMPRESSION)) +
-        chunk("IEND", "")
-    end
-
-    private
-
-    def chunk(type, data)
-      [data.bytesize].pack("N") + type + data + [Zlib.crc32(type + data)].pack("N")
-    end
-
-    def bit_depth
-      @palette.size <= 16 ? 4 : 8
-    end
-
-    def raw_stream
-      packed = {}.compare_by_identity
-      raw = String.new(capacity: @height * (@width + 1), encoding: Encoding::BINARY)
-
-      @scanlines.each do |line|
-        raw << FILTER_NONE << (packed[line] ||= pack_row(line))
-      end
-
-      raw
-    end
-
-    def pack_row(line)
-      return line.b if bit_depth == 8
-
-      indices = line.unpack("C*")
-      indices << 0 if indices.size.odd?
-      indices.each_slice(2).map { |hi, lo| (hi << 4) | lo }.pack("C*")
+    # palette: Array of "#rrggbb" Strings, the first one being the background.
+    # rects:   Array of [x, y, width, height, palette_index], painted in order.
+    def self.render(width:, height:, palette:, rects:)
+      Native.render_png(width, height, palette.map { |hex| hex.delete_prefix("#").to_i(16) }, rects)
     end
   end
 end

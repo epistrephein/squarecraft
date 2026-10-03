@@ -4,7 +4,7 @@ updates:
     directory: "/"
     versioning-strategy: increase-if-necessary
     schedule:
-      interval: "monthly"
+      interval: "semiannually"
     cooldown:
       default-days: 21
     open-pull-requests-limit: 3
@@ -18,7 +18,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "semiannually"
     groups:
       github-actions:
         patterns:

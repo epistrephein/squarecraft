@@ -116,9 +116,33 @@ RSpec.describe Squarecraft::Generator do
   describe "#paint!" do
     subject(:generator) { described_class.new(rows: 2, cols: 2) }
 
-    it "sets picture" do
+    it "sets picture to a PNG blob" do
       generator.paint!
-      expect(generator.picture).to be_a(Magick::Image)
+      expect(generator.picture).to be_a(String)
+      expect(generator.picture.bytesize).to be > 8
+      expect(generator.picture.byteslice(0, 8)).to eq("\x89PNG\r\n\x1a\n".b)
+    end
+
+    it "encodes the expected dimensions in the PNG header" do
+      generator.paint!
+      width, height = generator.picture.byteslice(16, 8).unpack("NN")
+      expect(width).to eq(1612)
+      expect(height).to eq(1612)
+    end
+
+    it "draws every tile with its color over the background" do
+      generator = described_class.new(rows: 3, cols: 4, size: 2, gap: 0.5, margin: 1, multiplier: 10)
+      colors = PngReader.read(generator.paint!.picture).colors
+
+      expect(colors.first.uniq).to eq([generator.background])
+      generator.sequence.each_char.with_index do |color, index|
+        x = 10 + ((index % 4) * 25)
+        y = 10 + ((index / 4) * 25)
+
+        expect(colors[y][x]).to eq(generator.colors[color.to_i])
+        expect(colors[y + 15][x + 15]).to eq(generator.colors[color.to_i])
+        expect(colors[y + 16][x + 16]).to eq(generator.background)
+      end
     end
 
     it "sets epoch" do

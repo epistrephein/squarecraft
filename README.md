@@ -12,36 +12,24 @@ It works like this:
 2. Squarecraft walks a `rows × cols` grid and, for each cell, picks a palette
    color using that PRNG.
 3. Each cell is drawn as a square with a configurable size, gap, margin, and scale.
-4. The image is written to a PNG whose filename records the seed, background,
-   and palette, so any picture can be traced back to the exact inputs that
-   produced it.
+4. The tiles are handed to a native renderer written in Rust, which paints them
+   into an indexed-color PNG, then the picture is written to disk with a
+   filename that records the seed, background, and palette, so any picture
+   can be traced back to the exact inputs that produced it.
 
 Because the RNG is seeded, generation is fully deterministic: using the same seed,
 palette and geometry will produce a byte-for-byte identical layout every time.
 
-## Requirements
+## Usage
 
-- **Ruby 4**
-- **ImageMagick** (the [RMagick](https://github.com/rmagick/rmagick) gem does
-  the actual drawing)
-
-Install ImageMagick first:
-
-```bash
-# macOS
-brew install imagemagick
-
-# Debian/Ubuntu
-sudo apt-get install libmagickwand-dev imagemagick
-```
-
-Then just install the gem dependencies:
+Building requires a [Rust toolchain](https://rustup.rs) (stable) and `libclang`
+in addition to Ruby. Install the gem dependencies and compile the native
+extension:
 
 ```bash
 bundle install
+bundle exec rake compile
 ```
-
-## Usage
 
 Run the CLI with no arguments to generate an image using the built-in defaults:
 
@@ -88,13 +76,15 @@ bin/squarecraft --palette caprese --rows 24 --cols 24 --gap 0.25
 | `-v`  | `--version`       |                     | Print the version                                  |
 | `-h`  | `--help`          |                     | Show help                                          |
 
-Colors and backgrounds must be six-digit hex (`#rrggbb`); seeds must be a valid hex string.  
-Palette and geometry options are simply presets that fill in these same values: anything
-passed explicitly on the command line overrides the preset.
+Colors and backgrounds must be six-digit hex (`#rrggbb`); seeds must be a valid
+hex string.  
+Palette and geometry options are simply presets that fill in these same values:
+anything passed explicitly on the command line overrides the preset.
 
 ## Palettes and geometries
 
-Presets live in plain YAML files so custom values can be added without touching any code.
+Presets live in plain YAML files so custom values can be added without touching
+any code.
 
 **`config/palettes.yml`** – each palette names a `background` and a list of `colors`:
 
@@ -134,13 +124,42 @@ It can be used for experimenting with the generator directly in Ruby:
 ```ruby
 gen = Squarecraft::Generator.new(seed: "a1b2c3d4", **Squarecraft::Config.palettes[:sunset])
 gen.paint!
-gen.picture.write("out.png")
+File.binwrite("out.png", gen.picture)
+```
+
+### Native renderer
+
+Everything users interact with (CLI, options, presets, seeding and tile
+layout) is Ruby. Rasterization and PNG encoding live in a Rust extension under
+`ext/squarecraft`, exposed to Ruby as `Squarecraft::Png.render`. Since the
+pictures are made of a few rows of identical tiles, the renderer never touches
+pixels one by one:
+
+- the canvas is swept top to bottom and split into bands of identical rows,
+  each stored once as runs of palette indices, packed to the smallest bit
+  depth that fits the palette;
+- the scanlines are compressed by a deflate encoder built for that shape: each
+  run becomes a literal plus back-references, repeated rows become either
+  Up-filtered zero rows or back-references one row away (whichever is
+  smaller), and the Huffman codes are built from the exact symbol frequencies;
+- the Adler-32 checksum is computed in closed form per run and per repeated
+  row.
+
+The cost therefore grows with the number of bands, runs, and emitted symbols
+rather than with the number of pixels: the default 4020×4020 picture renders in
+about a millisecond.
+
+After changing the Rust code, rebuild the extension with:
+
+```bash
+bundle exec rake compile
 ```
 
 Tests and linting can be run with:
 
 ```bash
-rake spec
+rake spec        # compiles the extension, then runs RSpec
+rake cargo_test  # Rust unit tests
 rake rubocop
 ```
 

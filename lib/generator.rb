@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require "rmagick"
 require "securerandom"
+
+require_relative "png"
 
 module Squarecraft
   class Generator
@@ -89,17 +90,24 @@ module Squarecraft
     end
 
     def draw!
-      bg  = Magick::SolidFill.new(background)
-      img = Magick::Image.new(*picture_size, bg)
+      width, height = picture_size.map(&:round)
 
-      sequence.chars.each_with_index do |c, i|
-        gc = Magick::Draw.new
-        gc.fill(colors[c.to_i])
-        gc.rectangle(*coords(i))
-        gc.draw(img)
+      Png.render(width:   width,
+                 height:  height,
+                 palette: [background] + colors,
+                 rects:   rects)
+    end
+
+    # One [x, y, width, height, palette_index] square per tile, where index 0
+    # is the background.
+    def rects
+      side = ((size - gap) * multiplier).round + 1 # rectangle edges are inclusive
+
+      sequence.each_char.with_index.map do |color, index|
+        x, y, = coords(index)
+
+        [x.round, y.round, side, side, color.to_i + 1]
       end
-
-      img
     end
 
     def picture_size
